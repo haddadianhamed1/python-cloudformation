@@ -1,0 +1,83 @@
+{
+        "AWSTemplateFormatVersion" : "2010-09-09",
+        "Description" : "Hamed General CloudFormation to Create EC2",
+        "Mappings": {
+                "AccountMapping" : {
+                        "768648327470" : {
+                                "Name" : "personal"
+                        },
+                        "xxxxxxxxx" : {
+                                "Name" : "PreProd"
+                        }
+                },
+                "personal": {
+                  "us-east-2": {
+                      "AMI": "ami-38cd975d",
+                      "VpcId": "vpc-e8b35981",
+                      "VpcSubnet": "172.31.0.0/16",
+                      "AvailabilityZones": [
+                              "us-east-2a",
+                              "us-east-2b",
+                              "us-east-2c"
+                      ],
+                      "VPCSubnets": [
+                              "subnet-21aa5a48",
+                              "subnet-4c393234",
+                              "subnet-f95d76b3"
+                      ],
+                      "Timezone": "UTC"
+                  }
+                }
+        },
+        "Resources" : {
+          "LaunchConfigEC2" : {
+            "Type" : "AWS::AutoScaling::LaunchConfiguration",
+            "Metadata":{
+              "Comment": "Default EC2 Instance",
+              "AWS::CloudFormation::Init": {
+                "commands": {
+                  "001-install-httpd": {
+                    "command": "yum install httpd -y",
+                    "cwd": "~"
+                  }
+                }
+              }
+            },
+            "Properties" : {
+                "ImageId" : { "Fn::FindInMap": [ { "Fn::FindInMap": [ "AccountMapping", { "Ref": "AWS::AccountId" }, "Name" ] }, { "Ref": "AWS::Region" }, "AMI" ] },
+                "KeyName": "hamed-us-east-2",
+                "InstanceType" : "t2.micro",
+                "UserData": {
+                        "Fn::Base64": {
+                                "Fn::Join": [ "\n", [
+                                        "#!/bin/bash -xe",
+                                        "# Note:  Requires cfn-aws-bootstrap tools in /opt/aws/bin",
+                                        "# run metadata settings defined for this server.",
+                                        { "Fn::Join": ["", [ "/opt/aws/bin/cfn-init --stack ", { "Ref": "AWS::StackName" }, " --resource LaunchConfigEC2 --region ", { "Ref": "AWS::Region" } ] ] },
+                                        "# signal that we have completed building the server.",
+                                        { "Fn::Join": ["", [ "/opt/aws/bin/cfn-signal -e $? --stack ", { "Ref": "AWS::StackName" }, " --resource ec2instance1 --region ", { "Ref": "AWS::Region" } ] ] }
+                                ]]
+                        }
+                }
+            },
+            "CreationPolicy": {
+              "ResourceSignal": {
+                "Count": "1",
+                "Timeout": "PT30M"
+              }
+            }
+          },
+          "ServerGroup": {
+            "Type": "AWS::AutoScaling::AutoScalingGroup",
+            "Properties": {
+              "AvailabilityZones": {"Fn::FindInMap": [ { "Fn::FindInMap": [ "AccountMapping", { "Ref": "AWS::AccountId" }, "Name" ] }, { "Ref": "AWS::Region" }, "AvailabilityZones" ] },
+              "LaunchConfigurationName": {"Ref": "LaunchConfigEC2"},
+              "MaxSize": 3,
+              "MinSize": 1,
+
+            }
+          }
+        }
+
+}
+

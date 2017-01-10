@@ -1,0 +1,14 @@
+'''
+Created on Jan 9, 2017
+
+@author: root
+'''
+import boto3
+
+def main():
+    client = boto3.client('s3')
+    response = client.list_buckets()
+
+if __name__ == '__main__':
+    main()
+    

@@ -1,0 +1,9 @@
+INSTUPPro.test
+/Users/hamedh/Documents/workspace/1st-cloudformation/Pro/test.py
+INFOS:&&2|1|2|0&&2|3|2|0&&2|4|2|0&&2|5|2|0&&2|6|2|0
+cfn_Stack=4
+s3listing=1
+get_aws_session=5
+main=6
+get_aws_client=3
+Pro.test=2

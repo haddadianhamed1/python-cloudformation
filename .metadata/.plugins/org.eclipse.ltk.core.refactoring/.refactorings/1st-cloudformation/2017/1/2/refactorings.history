@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;1st-cloudformation/Pro/test.json&apos; to &apos;generic-asg.json&apos;" description="Rename resource &apos;test.json&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="Pro/test.json" name="generic-asg.json" stamp="1484013052807" updateReferences="true"/>
+</session>
